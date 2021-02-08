@@ -353,11 +353,11 @@ def sample_images(epoch):
 
 # Instantiate the optimizer for both networks
 # (learning_rate=0.0002, beta_1=0.5 are recommended)
-generator_optimizer = keras.optimizers.Adam(
-    learning_rate=0.0001, beta_1=0.0, beta_2=0.9
+generator_optimizer = keras.optimizers.SGD(
+    learning_rate=0.02
 )
-discriminator_optimizer = keras.optimizers.Adam(
-    learning_rate=0.0001, beta_1=0.0, beta_2=0.9
+discriminator_optimizer = keras.optimizers.SGD(
+    learning_rate=0.02
 )
 
 # Define the loss functions for the discriminator,

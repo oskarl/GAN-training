@@ -19,7 +19,7 @@ class WGANGP:
 		fake_loss = tf.reduce_mean(fake_logits)
 		
 		gp = self.gradient_penalty(real_input, fake_input)
-
+		
 		return fake_loss - real_loss + gp * self.gp_weight
 
 	def gen_loss(self, disc_output):
