@@ -4,21 +4,29 @@ import zipfile
 from keras.preprocessing.image import load_img
 from keras.preprocessing.image import img_to_array
 import cv2
+import pickle
 
 class CelebA:
 	def __init__(self, size=32, zip_file_path='files/img_align_celeba.zip', dtype='float32'):
-		with zipfile.ZipFile(zip_file_path, 'r') as ziphandler:
-			i = 0
-			X_train = np.zeros((200000, size, size, 3), dtype=dtype)
-			for filename in ziphandler.namelist()[1:200000]:
-				img = ziphandler.read(filename)
-				d = cv2.imdecode(np.frombuffer(img, np.uint8), -1)
-				d = cv2.cvtColor(d, cv2.COLOR_BGR2RGB)
-				d2 = cv2.resize(d, (size,size))
-				X_train[i] = d2 / 127.5 - 1
-				i += 1
-				if i%5000 == 0:
-					print('Load dataset',i)
+		X_train = None
+		if zip_file_path.endswith('.pickle'):
+			f = open(zip_file_path,'rb')
+			object_file = pickle.load(f)
+			X_train = object_file['images']
+			X_train = X_train * 2 - 1
+		else:
+			with zipfile.ZipFile(zip_file_path, 'r') as ziphandler:
+				i = 0
+				X_train = np.zeros((200000, size, size, 3), dtype=dtype)
+				for filename in ziphandler.namelist()[1:200000]:
+					img = ziphandler.read(filename)
+					d = cv2.imdecode(np.frombuffer(img, np.uint8), -1)
+					d = cv2.cvtColor(d, cv2.COLOR_BGR2RGB)
+					d2 = cv2.resize(d, (size,size))
+					X_train[i] = d2 / 127.5 - 1
+					i += 1
+					if i%5000 == 0:
+						print('Load dataset',i)
 
 		self.X = X_train
 		self.img_shape = (size, size, 3)

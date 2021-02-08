@@ -5,11 +5,10 @@ from keras.layers.advanced_activations import LeakyReLU
 from keras.layers.convolutional import UpSampling2D, Conv2D
 from keras.models import Sequential, Model
 from keras.models import load_model
+from tensorflow.keras import layers
 from keras.optimizers import Adam, SGD
 import numpy as np
 import tensorflow_probability as tfp
-from tensorflow.keras import layers
-
 
 def conv_block(
 	x,
@@ -28,7 +27,7 @@ def conv_block(
 	)(x)
 	if use_bn:
 		x = layers.BatchNormalization()(x)
-		x = activation(x)
+	x = activation(x)
 	if use_dropout:
 		x = layers.Dropout(drop_value)(x)
 	return x
@@ -73,7 +72,9 @@ class OptimisticMirrorDescent2018:
 		self.sigmoid = sigmoid
 
 		self.discriminator = self.build_discriminator(sigmoid=sigmoid)
+		self.discriminator.summary()
 		self.generator = self.build_generator()
+		self.generator.summary()
 		self.name = "OMD2018Architecture"
 
 	def build_generator(self):
