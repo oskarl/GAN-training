@@ -102,7 +102,7 @@ class FID:
 		noise = np.random.normal(0, 1, (self.samples, model.latent_dim))
 		images = model.generator.predict(noise)
 		
-		gan_fid = self.fd(fake_images, batch_size=self.batch_size)
+		gan_fid = self.fd(images, batch_size=self.batch_size)
 
 		return float(gan_fid)
 
