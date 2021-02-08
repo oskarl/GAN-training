@@ -1,5 +1,7 @@
 #don't include experiment results
 runs/
+#don't include misc large files
+files/
 
 #.DS_Store
 .DS_Store

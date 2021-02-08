@@ -26,10 +26,7 @@ class SGDA:
 		with tf.GradientTape() as tape:
 			fake_images = self.model.generator(random_latent_vectors, training=True)
 
-			fake_logits = self.model.discriminator(fake_images, training=True)
-			real_logits = self.model.discriminator(real_images, training=True)
-
-			d_loss = self.loss.disc_loss(fake_output=fake_logits, real_output=real_logits)
+			d_loss = self.loss.disc_loss(real_input=real_images, fake_input=fake_images)
 
 		d_gradient = tape.gradient(d_loss, self.model.discriminator.trainable_variables)
 		self.optimizer.apply_gradients(

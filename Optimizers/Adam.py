@@ -25,32 +25,18 @@ class Adam:
 
 	def train_step(self, batch_size):
 		real_images = self.dataset.batch(batch_size)
-		with tf.GradientTape() as tape:
-			real_logits = self.model.discriminator(real_images, training=True)
 
-			d_loss_real = self.loss.disc_loss(output=real_logits, fake=False)
-		
-		d_gradient = tape.gradient(d_loss_real, self.model.discriminator.trainable_variables)
-		self.d_optimizer.apply_gradients(
-			zip(d_gradient, self.model.discriminator.trainable_variables)
-		)
-		
 		random_latent_vectors = tf.random.normal(shape=(batch_size, self.model.latent_dim))
 
 		with tf.GradientTape() as tape:
 			fake_images = self.model.generator(random_latent_vectors, training=True)
 
-			fake_logits = self.model.discriminator(fake_images, training=True)
-
-			d_loss_fake = self.loss.disc_loss(output=fake_logits, fake=True)
-
+			d_loss = self.loss.disc_loss(real_input=real_images, fake_input=fake_images)
 		
-		d_gradient = tape.gradient(d_loss_fake, self.model.discriminator.trainable_variables)
+		d_gradient = tape.gradient(d_loss, self.model.discriminator.trainable_variables)
 		self.d_optimizer.apply_gradients(
 			zip(d_gradient, self.model.discriminator.trainable_variables)
 		)
-
-		d_loss = 0.5 * (d_loss_real + d_loss_fake)
 		
 		random_latent_vectors = tf.random.normal(shape=(batch_size, self.model.latent_dim))
 		with tf.GradientTape() as tape:

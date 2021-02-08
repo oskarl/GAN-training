@@ -40,7 +40,10 @@ def sample_images(folder, model, epoch):
     cnt = 0
     for i in range(r):
         for j in range(c):
-            axs[i,j].imshow(gen_imgs[cnt, :,:,0], cmap='gray')
+            if model.img_shape[2] == 1:
+                axs[i,j].imshow(gen_imgs[cnt, :,:,0], cmap='gray')
+            else:
+                axs[i,j].imshow(gen_imgs[cnt, :,:,:])
             axs[i,j].axis('off')
             cnt += 1    
 

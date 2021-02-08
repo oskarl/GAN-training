@@ -6,9 +6,9 @@ class MNIST_IS:
 	def __init__(self, samples=100):
 		self.eps = 1e-16
 		self.samples = samples
-		script_dir = os.path.dirname(__file__)
-		path = os.path.join(script_dir, 'mnist_classifier')
-		self.classifier_model = load_model(path)
+		#script_dir = os.path.dirname(__file__)
+		#path = os.path.join(script_dir, 'mnist_classifier')
+		self.classifier_model = load_model('files/mnist_classifier')
 		self.name = 'InceptionScore'
 
 	def calculate(self, model, dataset):

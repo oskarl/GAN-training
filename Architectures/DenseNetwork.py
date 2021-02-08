@@ -9,11 +9,11 @@ from keras.optimizers import Adam, SGD
 import numpy as np
 
 class DenseNetwork:
-	def __init__(self, img_shape=None, latent_dim=None):
+	def __init__(self, img_shape=None, latent_dim=None, sigmoid=True):
 		self.img_shape = img_shape
 		self.latent_dim = latent_dim
 
-		self.discriminator = self.build_discriminator()
+		self.discriminator = self.build_discriminator(sigmoid=sigmoid)
 		self.generator = self.build_generator()
 		self.name = "DenseNetwork"
 
@@ -39,7 +39,7 @@ class DenseNetwork:
 
 		return Model(noise, img)
 
-	def build_discriminator(self):
+	def build_discriminator(self, sigmoid=True):
 		model = Sequential()
 
 		model.add(Flatten(input_shape=self.img_shape))
@@ -47,7 +47,7 @@ class DenseNetwork:
 		model.add(LeakyReLU(alpha=0.2))
 		model.add(Dense(256))
 		model.add(LeakyReLU(alpha=0.2))
-		model.add(Dense(1, activation='sigmoid'))
+		model.add(Dense(1, activation='sigmoid' if sigmoid else None))
 		#model.summary()
 
 		img = Input(shape=self.img_shape)
