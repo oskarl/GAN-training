@@ -6,7 +6,7 @@ import numpy as np
 class EG:
 	def __init__(
 		self, 
-		step_size=0.02, 
+		step_size=0.0001, 
 		same_sample=False,
 		model=None,
 		loss=None,
@@ -37,6 +37,10 @@ class EG:
 
 		d_gradient = tape.gradient(d_loss, self.model.discriminator.trainable_variables)
 
+		self.optimizer.apply_gradients(
+			zip([self.step_size * g for g in d_gradient], self.model.discriminator.trainable_variables)
+		)
+
 		random_latent_vectors_2 = tf.random.normal(shape=(batch_size, self.model.latent_dim))
 		with tf.GradientTape() as tape:
 			generated_images = self.model.generator(random_latent_vectors_2, training=True)
@@ -46,9 +50,6 @@ class EG:
 
 		gen_gradient = tape.gradient(g_loss, self.model.generator.trainable_variables)
 		
-		self.optimizer.apply_gradients(
-			zip([self.step_size * g for g in d_gradient], self.model.discriminator.trainable_variables)
-		)
 		self.optimizer.apply_gradients(
 			zip([self.step_size * g for g in gen_gradient], self.model.generator.trainable_variables)
 		)
@@ -66,7 +67,12 @@ class EG:
 
 		d_gradient = tape.gradient(d_loss, self.model.discriminator.trainable_variables)
 
-		random_latent_vectors_2 = tf.random.normal(shape=(batch_size, self.model.latent_dim))
+		self.model.discriminator.set_weights(disc_weights)
+
+		self.optimizer.apply_gradients(
+			zip([self.step_size * g for g in d_gradient], self.model.discriminator.trainable_variables)
+		)
+
 		with tf.GradientTape() as tape:
 			generated_images = self.model.generator(random_latent_vectors_2, training=True)
 			gen_img_logits = self.model.discriminator(generated_images, training=True)
@@ -76,11 +82,7 @@ class EG:
 		gen_gradient = tape.gradient(g_loss, self.model.generator.trainable_variables)
 
 		self.model.generator.set_weights(gen_weights)
-		self.model.discriminator.set_weights(disc_weights)
 
-		self.optimizer.apply_gradients(
-			zip([self.step_size * g for g in d_gradient], self.model.discriminator.trainable_variables)
-		)
 		self.optimizer.apply_gradients(
 			zip([self.step_size * g for g in gen_gradient], self.model.generator.trainable_variables)
 		)

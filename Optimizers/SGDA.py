@@ -6,7 +6,7 @@ import numpy as np
 class SGDA:
 	def __init__(
 		self, 
-		step_size=0.02, 
+		step_size=0.0001, 
 		model=None,
 		loss=None,
 		dataset=None
