@@ -4,6 +4,7 @@ import numpy as np
 import cv2
 from scipy.linalg import sqrtm
 import math
+import pickle
 
 def update_mean_cov(mean, cov, N, batch):
 	batch_N = batch.shape[0]
@@ -101,7 +102,7 @@ class FID:
 		noise = np.random.normal(0, 1, (self.samples, model.latent_dim))
 		images = model.generator.predict(noise)
 		
-		gan_fid = fd(fake_images, batch_size=self.batch_size)
+		gan_fid = self.fd(fake_images, batch_size=self.batch_size)
 
 		return float(gan_fid)
 
