@@ -1,6 +1,9 @@
 import numpy as np
 from keras.models import load_model
 
+def sigmoid(x):
+	return 1 / (1 + np.exp(-x))
+
 class DiscriminatorAccuracy:
 	def __init__(self, samples=100):
 		self.samples = samples
@@ -14,6 +17,10 @@ class DiscriminatorAccuracy:
 		
 		real = model.discriminator.predict(real_images)
 		fake = model.discriminator.predict(fake_images)
+
+		if not model.sigmoid:
+			real = sigmoid(real)
+			fake = sigmoid(fake)
 
 		acc = (np.count_nonzero(real > 0.5) + np.count_nonzero(fake < 0.5)) / (self.samples*2)
 		return float(acc)

@@ -13,6 +13,7 @@ class DCGan:
 		self.img_shape = img_shape
 		self.channels = img_shape[2]
 		self.latent_dim = latent_dim
+		self.sigmoid = sigmoid
 
 		self.discriminator = self.build_discriminator(sigmoid=sigmoid)
 		self.generator = self.build_generator()

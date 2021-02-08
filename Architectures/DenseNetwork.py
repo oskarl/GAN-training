@@ -12,6 +12,7 @@ class DenseNetwork:
 	def __init__(self, img_shape=None, latent_dim=None, sigmoid=True):
 		self.img_shape = img_shape
 		self.latent_dim = latent_dim
+		self.sigmoid = sigmoid
 
 		self.discriminator = self.build_discriminator(sigmoid=sigmoid)
 		self.generator = self.build_generator()
