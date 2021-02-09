@@ -3,10 +3,12 @@ from tensorflow import keras
 import keras.backend as K
 import numpy as np
 
-class EG:
+class ExtraAdam:
 	def __init__(
 		self, 
-		step_size=0.0001, 
+		step_size=0.0001,
+		beta1=0.5,
+		beta2=0.999,
 		same_sample=False,
 		model=None,
 		loss=None,
@@ -17,8 +19,9 @@ class EG:
 		self.dataset = dataset
 		self.step_size = step_size
 		self.same_sample = same_sample
-		self.optimizer = keras.optimizers.SGD(step_size)
-		self.name = 'EG' + ' Same Sample' if same_sample else '' + ' (' + str(self.step_size) + ')'
+		self.d_optimizer = keras.optimizers.Adam(learning_rate=step_size, beta_1=beta1, beta_2=beta2)
+		self.g_optimizer = keras.optimizers.Adam(learning_rate=step_size, beta_1=beta1, beta_2=beta2)
+		self.name = 'ExtraAdam (' + str(self.step_size) + ', ' + str(beta1) + ', ' + str(beta2) + ')'
 
 	def train_step(self, batch_size):
 		real_images = self.dataset.batch(batch_size)
@@ -46,10 +49,10 @@ class EG:
 
 		gen_gradient = tape.gradient(g_loss, self.model.generator.trainable_variables)
 		
-		self.optimizer.apply_gradients(
+		self.d_optimizer.apply_gradients(
 			zip(d_gradient, self.model.discriminator.trainable_variables)
 		)
-		self.optimizer.apply_gradients(
+		self.g_optimizer.apply_gradients(
 			zip(gen_gradient, self.model.generator.trainable_variables)
 		)
 
@@ -77,10 +80,10 @@ class EG:
 		self.model.generator.set_weights(gen_weights)
 		self.model.discriminator.set_weights(disc_weights)
 
-		self.optimizer.apply_gradients(
+		self.d_optimizer.apply_gradients(
 			zip(d_gradient, self.model.discriminator.trainable_variables)
 		)
-		self.optimizer.apply_gradients(
+		self.g_optimizer.apply_gradients(
 			zip(gen_gradient, self.model.generator.trainable_variables)
 		)
 

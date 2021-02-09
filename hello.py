@@ -9,7 +9,7 @@ dataset = Datasets.CelebA(zip_file_path='files/32x32.pickle')
 #model = Architectures.DenseNetwork(img_shape=dataset.img_shape, latent_dim=100, sigmoid=False)
 model = Architectures.OptimisticMirrorDescent2018(img_shape=dataset.img_shape, latent_dim=100, sigmoid=False)
 loss = Losses.WGANGP(model=model, gradient_penalty=1.0)
-trainer = Optimizers.SGDA(step_size=0.0001, model=model, loss=loss, dataset=dataset)
+trainer = Optimizers.OptimisticAdam(step_size=0.0001, model=model, loss=loss, dataset=dataset)
 #trainer = Optimizers.SGDA(step_size=0.02, model=model, loss=loss, dataset=dataset)
 
 filename = 'CelebA-WGANGP-OGDA'
