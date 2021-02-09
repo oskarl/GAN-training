@@ -59,6 +59,7 @@ class ExtraAdam:
 		# update:
 
 		if not self.same_sample:
+			real_images = self.dataset.batch(batch_size)
 			random_latent_vectors_1 = tf.random.normal(shape=(batch_size, self.model.latent_dim))
 			random_latent_vectors_2 = tf.random.normal(shape=(batch_size, self.model.latent_dim))
 
@@ -77,9 +78,9 @@ class ExtraAdam:
 
 		gen_gradient = tape.gradient(g_loss, self.model.generator.trainable_variables)
 
-		#self.model.generator.set_weights(gen_weights)
-		#self.model.discriminator.set_weights(disc_weights)
-
+		self.model.generator.set_weights(gen_weights)
+		self.model.discriminator.set_weights(disc_weights)
+		
 		self.d_optimizer.apply_gradients(
 			zip(d_gradient, self.model.discriminator.trainable_variables)
 		)

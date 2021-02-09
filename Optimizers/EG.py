@@ -56,6 +56,7 @@ class EG:
 		# update:
 
 		if not self.same_sample:
+			real_images = self.dataset.batch(batch_size)
 			random_latent_vectors_1 = tf.random.normal(shape=(batch_size, self.model.latent_dim))
 			random_latent_vectors_2 = tf.random.normal(shape=(batch_size, self.model.latent_dim))
 
