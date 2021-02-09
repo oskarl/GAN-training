@@ -23,8 +23,12 @@ class EG:
 	def train_step(self, batch_size):
 		real_images = self.dataset.batch(batch_size)
 
-		gen_weights = self.model.generator.get_weights()
-		disc_weights = self.model.discriminator.get_weights()
+		gen_weights = []
+		for layer in self.model.generator.layers:
+			gen_weights.append(layer.get_weights())
+		disc_weights = []
+		for layer in self.model.discriminator.layers:
+			disc_weights.append(layer.get_weights())
 
 		# lookahead:
 

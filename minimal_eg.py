@@ -170,10 +170,11 @@ class GAN():
             self.combined.optimizer.apply_gradients(zip(grads_gen_2, self.combined.trainable_variables))
 
             #print(K.eval(self.optimizer.iterations))
-
+            print ("%d [D loss: %f] [G loss: %f]" % (epoch, d_loss, g_loss))
+            
             if (epoch+1) % sample_interval == 0:
                 # Plot the progress
-                print ("%d [D loss: %f] [G loss: %f]" % (epoch, d_loss, g_loss))
+                
 
                 self.sample_images(epoch)
 

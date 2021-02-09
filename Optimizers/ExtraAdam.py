@@ -19,15 +19,22 @@ class ExtraAdam:
 		self.dataset = dataset
 		self.step_size = step_size
 		self.same_sample = same_sample
-		self.d_optimizer = keras.optimizers.Adam(learning_rate=step_size, beta_1=beta1, beta_2=beta2)
-		self.g_optimizer = keras.optimizers.Adam(learning_rate=step_size, beta_1=beta1, beta_2=beta2)
+
+		self.step_size = step_size
+		self.beta1 = beta1
+		self.beta2 = beta2
+		self.t = 0
+		self.eps = 1e-7
+		self.gen_m = None
+		self.gen_v = None
+		self.d_m = None
+		self.d_v = None
+		
+		self.optimizer = keras.optimizers.SGD(1.)
 		self.name = 'ExtraAdam (' + str(self.step_size) + ', ' + str(beta1) + ', ' + str(beta2) + ')'
 
 	def train_step(self, batch_size):
 		real_images = self.dataset.batch(batch_size)
-
-		gen_weights = self.model.generator.get_weights()
-		disc_weights = self.model.discriminator.get_weights()
 
 		# lookahead:
 
@@ -49,11 +56,37 @@ class ExtraAdam:
 
 		gen_gradient = tape.gradient(g_loss, self.model.generator.trainable_variables)
 		
-		self.d_optimizer.apply_gradients(
-			zip(d_gradient, self.model.discriminator.trainable_variables)
+		self.t += 1
+
+		if self.d_m == None:
+			self.d_m = [(1-self.beta1) * g for g in d_gradient]
+			self.d_v = [(1-self.beta2) * g * g for g in d_gradient]
+		else:
+			self.d_m = [self.beta1 * self.d_m[i] + (1-self.beta1) * d_gradient[i] for i in range(len(d_gradient))]
+			self.d_v = [self.beta2 * self.d_v[i] + (1-self.beta2) * d_gradient[i] * d_gradient[i] for i in range(len(d_gradient))]
+		mth = [m / (1-self.beta1**self.t) for m in self.d_m]
+		vth = [v / (1-self.beta2**self.t) for v in self.d_v]
+
+		d_grad = [self.step_size * mth[i] / (tf.sqrt(vth[i]) + self.eps)
+				for i in range(len(d_gradient))]
+
+		if self.gen_m == None:
+			self.gen_m = [(1-self.beta1) * g for g in gen_gradient]
+			self.gen_v = [(1-self.beta2) * g * g for g in gen_gradient]
+		else:
+			self.gen_m = [self.beta1 * self.gen_m[i] + (1-self.beta1) * gen_gradient[i] for i in range(len(gen_gradient))]
+			self.gen_v = [self.beta2 * self.gen_v[i] + (1-self.beta2) * gen_gradient[i] * gen_gradient[i] for i in range(len(gen_gradient))]
+		mth = [m / (1-self.beta1**self.t) for m in self.gen_m]
+		vth = [v / (1-self.beta2**self.t) for v in self.gen_v]
+
+		gen_grad = [self.step_size * mth[i] / (tf.sqrt(vth[i]) + self.eps)
+				for i in range(len(gen_gradient))]
+
+		self.optimizer.apply_gradients(
+			zip(d_grad, self.model.discriminator.trainable_variables)
 		)
-		self.g_optimizer.apply_gradients(
-			zip(gen_gradient, self.model.generator.trainable_variables)
+		self.optimizer.apply_gradients(
+			zip(gen_grad, self.model.generator.trainable_variables)
 		)
 
 		# update:
@@ -78,14 +111,36 @@ class ExtraAdam:
 
 		gen_gradient = tape.gradient(g_loss, self.model.generator.trainable_variables)
 
-		self.model.generator.set_weights(gen_weights)
-		self.model.discriminator.set_weights(disc_weights)
-		
-		self.d_optimizer.apply_gradients(
-			zip(d_gradient, self.model.discriminator.trainable_variables)
+		self.optimizer.apply_gradients(
+			zip(-1 * d_grad, self.model.discriminator.trainable_variables)
 		)
-		self.g_optimizer.apply_gradients(
-			zip(gen_gradient, self.model.generator.trainable_variables)
+		self.optimizer.apply_gradients(
+			zip(-1 * gen_grad, self.model.generator.trainable_variables)
+		)
+
+		self.t += 1
+
+		self.d_m = [self.beta1 * self.d_m[i] + (1-self.beta1) * d_gradient[i] for i in range(len(d_gradient))]
+		self.d_v = [self.beta2 * self.d_v[i] + (1-self.beta2) * d_gradient[i] * d_gradient[i] for i in range(len(d_gradient))]
+		mth = [m / (1-self.beta1**self.t) for m in self.d_m]
+		vth = [v / (1-self.beta2**self.t) for v in self.d_v]
+
+		d_grad = [self.step_size * mth[i] / (tf.sqrt(vth[i]) + self.eps)
+				for i in range(len(d_gradient))]
+
+		self.gen_m = [self.beta1 * self.gen_m[i] + (1-self.beta1) * gen_gradient[i] for i in range(len(gen_gradient))]
+		self.gen_v = [self.beta2 * self.gen_v[i] + (1-self.beta2) * gen_gradient[i] * gen_gradient[i] for i in range(len(gen_gradient))]
+		mth = [m / (1-self.beta1**self.t) for m in self.gen_m]
+		vth = [v / (1-self.beta2**self.t) for v in self.gen_v]
+		
+		gen_grad = [self.step_size * mth[i] / (tf.sqrt(vth[i]) + self.eps)
+				for i in range(len(gen_gradient))]
+
+		self.optimizer.apply_gradients(
+			zip(d_grad, self.model.discriminator.trainable_variables)
+		)
+		self.optimizer.apply_gradients(
+			zip(gen_grad, self.model.generator.trainable_variables)
 		)
 
 		return {"d_loss": K.eval(d_loss), "g_loss": K.eval(g_loss)}
