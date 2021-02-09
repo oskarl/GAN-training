@@ -53,6 +53,9 @@ class EG:
 			zip(gen_gradient, self.model.generator.trainable_variables)
 		)
 
+		d_gradient_1 = d_gradient
+		gen_gradient_1 = gen_gradient
+
 		# update:
 
 		if not self.same_sample:
@@ -75,8 +78,10 @@ class EG:
 
 		gen_gradient = tape.gradient(g_loss, self.model.generator.trainable_variables)
 
-		self.model.generator.set_weights(gen_weights)
-		self.model.discriminator.set_weights(disc_weights)
+		#self.model.generator.set_weights(gen_weights)
+		#self.model.discriminator.set_weights(disc_weights)
+		self.optimizer.apply_gradients(zip(-1 * d_gradient_1, self.model.discriminator.trainable_variables))
+		self.optimizer.apply_gradients(zip(-1 * gen_gradient_1, self.model.generator.trainable_variables))
 
 		self.optimizer.apply_gradients(
 			zip(d_gradient, self.model.discriminator.trainable_variables)
