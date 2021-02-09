@@ -77,8 +77,8 @@ class ExtraAdam:
 
 		gen_gradient = tape.gradient(g_loss, self.model.generator.trainable_variables)
 
-		self.model.generator.set_weights(gen_weights)
-		self.model.discriminator.set_weights(disc_weights)
+		#self.model.generator.set_weights(gen_weights)
+		#self.model.discriminator.set_weights(disc_weights)
 
 		self.d_optimizer.apply_gradients(
 			zip(d_gradient, self.model.discriminator.trainable_variables)
