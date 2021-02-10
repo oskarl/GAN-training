@@ -3,10 +3,11 @@ from tensorflow import keras
 import keras.backend as K
 import numpy as np
 
-class SGDA:
+class Nesterov:
 	def __init__(
 		self, 
 		step_size=0.0001, 
+		momentum_weight=0.0002,
 		model=None,
 		loss=None,
 		dataset=None
@@ -15,9 +16,10 @@ class SGDA:
 		self.loss = loss
 		self.dataset = dataset
 		self.step_size = step_size
-		self.d_optimizer = keras.optimizers.SGD(step_size)
-		self.g_optimizer = keras.optimizers.SGD(step_size)
-		self.name = 'SGDA (' + str(self.step_size) + ')'
+		self.momentum_weight = momentum_weight
+		self.d_optimizer = keras.optimizers.SGD(learning_rate=step_size, momentum=momentum_weight, nesterov=True)
+		self.g_optimizer = keras.optimizers.SGD(learning_rate=step_size, momentum=momentum_weight, nesterov=True)
+		self.name = 'Nesterov (' + str(self.step_size) + ', ' + str(momentum_weight) + ')'
 
 	def train_step(self, batch_size):
 		real_images = self.dataset.batch(batch_size)

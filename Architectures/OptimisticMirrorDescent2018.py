@@ -117,6 +117,18 @@ class OptimisticMirrorDescent2018:
 			padding="same",
 			use_dropout=False,
 		)
+		if self.img_shape[0] == 64:
+			x = upsample_block(
+				x,
+				32,
+				layers.ReLU(),
+				kernel_size=(4, 4),
+				strides=(2, 2),
+				use_bias=True,
+				use_bn=True,
+				padding="same",
+				use_dropout=False
+			)
 		x = upsample_block(
 			x, 3, layers.Activation("tanh"), kernel_size=(4, 4), strides=(1, 1), use_bias=True, use_bn=False, use_wn=True
 		)

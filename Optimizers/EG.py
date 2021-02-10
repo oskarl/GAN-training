@@ -18,7 +18,7 @@ class EG:
 		self.step_size = step_size
 		self.same_sample = same_sample
 		self.optimizer = keras.optimizers.SGD(step_size)
-		self.name = 'EG' + ' Same Sample' if same_sample else '' + ' (' + str(self.step_size) + ')'
+		self.name = 'EG' + (' Same Sample' if same_sample else '') + ' (' + str(self.step_size) + ')'
 
 	def train_step(self, batch_size):
 		real_images = self.dataset.batch(batch_size)

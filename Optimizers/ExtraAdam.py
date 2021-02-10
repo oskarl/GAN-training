@@ -31,7 +31,7 @@ class ExtraAdam:
 		self.d_v = None
 		
 		self.optimizer = keras.optimizers.SGD(1.)
-		self.name = 'ExtraAdam (' + str(self.step_size) + ', ' + str(beta1) + ', ' + str(beta2) + ')'
+		self.name = 'ExtraAdam' + (' Same Sample' if same_sample else '') + ' (' + str(self.step_size) + ', ' + str(beta1) + ', ' + str(beta2) + ')'
 
 	def train_step(self, batch_size):
 		real_images = self.dataset.batch(batch_size)
