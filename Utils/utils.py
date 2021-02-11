@@ -29,14 +29,14 @@ def save_json(folder, filename, data):
         handle.write(jsontext)
 
 def sample_images(folder, model, epoch):
-    r, c = 5, 5
+    r, c = 6, 6
     noise = np.random.normal(0, 1, (r * c, model.latent_dim))
     gen_imgs = model.generator.predict(noise)
 
     # Rescale images 0 - 1
     gen_imgs = 0.5 * gen_imgs + 0.5
 
-    fig, axs = plt.subplots(r, c)
+    fig, axs = plt.subplots(r, c, figsize=(model.img_shape[0]*c/100, model.img_shape[0]*r/100), dpi=100)
     cnt = 0
     for i in range(r):
         for j in range(c):
@@ -49,7 +49,9 @@ def sample_images(folder, model, epoch):
 
     filename = folder+"/"+str(epoch)+".png"
 
-    fig.savefig(filename)
+    plt.subplots_adjust(wspace=0, hspace=0)
+    plt.tight_layout(pad=0)
+    fig.savefig(filename, dpi=100)
     plt.close()
 
     return filename
