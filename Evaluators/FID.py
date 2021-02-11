@@ -27,6 +27,10 @@ def frechet_distance(mean1, cov1, mean2, cov2):
 	return fid
 
 class FrechetInceptionDistance(object):
+	# sizes <= 64: resize_to: 75
+	# size = 128: resize to: 139
+	# good sizes to resize to: 299 - 32 * n
+	
 	def __init__(self, mean, cov, image_range=(-1,1), resize_to=75):
 
 		self._inception_v3 = None

@@ -25,8 +25,8 @@ class FFHQ128:
 					d = cv2.imdecode(np.frombuffer(img, np.uint8), -1)
 					d = cv2.cvtColor(d, cv2.COLOR_BGR2RGB)
 					if size != 128:
-						d2 = cv2.resize(d, (size,size))
-					X_train[i] = d2 / 127.5 - 1
+						d = cv2.resize(d, (size,size))
+					X_train[i] = d / 127.5 - 1
 					i += 1
 					if i%500 == 0:
 						print('Load dataset',i)
