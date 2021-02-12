@@ -94,7 +94,7 @@ def save_video(folder, filename, images):
     cv2.destroyAllWindows()
     video.release()
 
-def run(folder, filename, iterations, save_every, batch_size, metrics, model, dataset, loss, trainer, resume=False):
+def run(folder, filename, iterations, save_every, batch_size, metrics, model, dataset, loss, trainer, resume=False, print_every=1):
     originalfolder = folder
     folder = folder + '/' + filename
 
@@ -149,7 +149,8 @@ def run(folder, filename, iterations, save_every, batch_size, metrics, model, da
 
     for i in range(start_i,end_i):
         r = trainer.train_step(batch_size=batch_size)
-        print(i,"d:",r['d_loss'],"g:",r['g_loss'])
+        if i%print_every == 0:
+            print(i,"d:",r['d_loss'],"g:",r['g_loss'])
         if i%save_every == 0:
             training_results['iteration'].append(i)
             training_results['d_loss'].append(float(r['d_loss']))
