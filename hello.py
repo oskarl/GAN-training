@@ -5,7 +5,9 @@ import Losses
 import Evaluators
 import Utils
 
-dataset = Datasets.MNIST()
+dataset = Datasets.ApplesOranges()
+print(dataset.set2.shape)
+'''
 model = Architectures.DenseNetwork(img_shape=dataset.img_shape, latent_dim=100, sigmoid=True)
 #model = Architectures.OptimisticMirrorDescent2018(img_shape=dataset.img_shape, latent_dim=100, sigmoid=False)
 loss = Losses.BCE(model=model)
@@ -21,3 +23,4 @@ save_every = 500
 metrics = [mnistis, da]
 
 Utils.run(folder='runs', filename=filename, iterations=iterations, save_every=save_every, batch_size=batch_size, metrics=metrics, model=model, dataset=dataset, loss=loss, trainer=trainer, resume=False)
+'''

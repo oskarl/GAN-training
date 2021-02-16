@@ -5,6 +5,7 @@ import json
 import cv2
 from tensorflow.python.client import device_lib
 import time
+import math
 
 def devices():
     ds = []
@@ -151,6 +152,8 @@ def run(folder, filename, iterations, save_every, batch_size, metrics, model, da
         r = trainer.train_step(batch_size=batch_size)
         if i%print_every == 0:
             print(i,"d:",r['d_loss'],"g:",r['g_loss'])
+        if math.isnan(r['d_loss']):
+            break
         if i%save_every == 0:
             training_results['iteration'].append(i)
             training_results['d_loss'].append(float(r['d_loss']))
